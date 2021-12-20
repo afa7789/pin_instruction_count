@@ -1,0 +1,30 @@
+##############################################################
+#
+# Build rules
+#
+##############################################################
+
+# This section contains the build rules for all binaries that have special build rules.
+# See makefile.default.rules for the default build rules.
+
+###### Special applications' build rules ######
+
+# Build the intermediate object file.
+$(OBJDIR)instructioncount$(OBJ_SUFFIX): instructioncount.cpp hashmap/hash.h
+	$(CXX) $(TOOL_CXXFLAGS) $(COMP_OBJ)$@ $<
+
+# Build the intermediate object file.
+$(OBJDIR)hash$(OBJ_SUFFIX): hashmap/hash.c hashmap/hash.h
+	$(CC) $(TOOL_CFLAGS) $(COMP_OBJ)$@ $<
+
+# Build the tool as a dll (shared object).
+$(OBJDIR)instructioncount$(PINTOOL_SUFFIX): $(OBJDIR)instructioncount$(OBJ_SUFFIX) $(OBJDIR)hash$(OBJ_SUFFIX)
+	$(LINKER) $(TOOL_LDFLAGS_NOOPT) $(LINK_EXE)$@ $(^:%.h=) $(TOOL_LPATHS) $(TOOL_LIBS)
+
+# Build the intermediate object file for the bbl trace.
+$(OBJDIR)bblcount$(OBJ_SUFFIX): bblcount.cpp hashmap/hash.h
+	$(CXX) $(TOOL_CXXFLAGS) $(COMP_OBJ)$@ $<	
+
+# Build the tool as a dll (shared object) for ins trace.
+$(OBJDIR)bblcount$(PINTOOL_SUFFIX): $(OBJDIR)bblcount$(OBJ_SUFFIX) $(OBJDIR)hash$(OBJ_SUFFIX)
+	$(LINKER) $(TOOL_LDFLAGS_NOOPT) $(LINK_EXE)$@ $(^:%.h=) $(TOOL_LPATHS) $(TOOL_LIBS)
