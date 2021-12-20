@@ -5,13 +5,13 @@ Two simple instrumentation for instruction counting made on c++ to be used with 
 
 ## Disclaimer
 
-This intruction tools have a hashmap folder, that's a c library made with [Andrei Rimsa](http://rimsa.com.br/page/) my professor and Thesis tutor from CEFET-MG `mostly him`.:rofl:
+These instructions tools have a hashmap folder, that's a c library made with [Andrei Rimsa](http://rimsa.com.br/page/) `mostly him` :rofl: , my professor and thesis tutor from CEFET-MG. 
 
 ## How to Install
 
 ### Install Curl
 
-we are using curl to download pin.
+We are using curl to download intel pin.
 
 [follow this tutorial](https://help.ubidots.com/en/articles/2165289-learn-how-to-install-run-curl-on-windows-macosx-linux)
 
