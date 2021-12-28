@@ -45,24 +45,6 @@ VOID countip(UniqueInstr ** bbl ,USIZE quantity) {
     }
 }
 
-// Pin calls this function every time a new instruction is encountered
-VOID InstructionTrace(INS ins, VOID *v)
-{   
-    int size = INS_Size(ins);
-
-    INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)countip, IARG_INST_PTR, IARG_UINT64 ,size , IARG_END);
-}
-
-// Pin calls this function every time a new BBL is encountered, and then for each Instruction in it trace it's Instruction.
-VOID InstructionTraceInBBL(BBL bbl){
-    for( INS ins= BBL_InsHead(bbl); INS_Valid(ins); ins = INS_Next(ins) ){
-
-        int size = INS_Size(ins);
-        INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)countip, IARG_INST_PTR, IARG_UINT64 ,size , IARG_END);
-
-    }
-}
-
 // Pin calls this function every time a new basic block is encountered
 // It inserts a call to docount
 VOID Trace(TRACE trace, VOID* v)
@@ -86,7 +68,6 @@ VOID Trace(TRACE trace, VOID* v)
     }
 }
 
-
 // This function is called when the application exits
 VOID Fini(INT32 code, VOID *v)
 {
@@ -105,7 +86,7 @@ VOID Fini_in_file(INT32 code, VOID *v)
 
 
 /* ===================================================================== */
-/* Print Help Message                                                    */
+/* Print Help Message                                                    
 /* ===================================================================== */
 
 INT32 Usage()
@@ -116,7 +97,7 @@ INT32 Usage()
 }
 
 /* ===================================================================== */
-/* Main                                                                  */
+/* Main                                                                  
 /* ===================================================================== */
 
 int main(int argc, char * argv[])
