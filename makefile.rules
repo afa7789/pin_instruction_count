@@ -4,9 +4,7 @@
 #
 ##############################################################
 
-TOOL_ROOTS := bblcount instructioncount
-
-LIB_ROOTS := hashmap/hash.c
+TOOL_ROOTS := blockcounter
 
 ##############################################################
 #
@@ -19,22 +17,10 @@ LIB_ROOTS := hashmap/hash.c
 
 ###### Special applications' build rules ######
 
-# Build the intermediate object file.
-$(OBJDIR)instructioncount$(OBJ_SUFFIX): instructioncount.cpp hashmap/hash.h
-	$(CXX) $(TOOL_CXXFLAGS) $(COMP_OBJ)$@ $<
-
-# Build the intermediate object file.
-$(OBJDIR)hash$(OBJ_SUFFIX): hashmap/hash.c hashmap/hash.h
-	$(CC) $(TOOL_CFLAGS) $(COMP_OBJ)$@ $<
-
-# Build the tool as a dll (shared object).
-$(OBJDIR)instructioncount$(PINTOOL_SUFFIX): $(OBJDIR)instructioncount$(OBJ_SUFFIX) $(OBJDIR)hash$(OBJ_SUFFIX)
-	$(LINKER) $(TOOL_LDFLAGS_NOOPT) $(LINK_EXE)$@ $(^:%.h=) $(TOOL_LPATHS) $(TOOL_LIBS)
-
 # Build the intermediate object file for the bbl trace.
-$(OBJDIR)bblcount$(OBJ_SUFFIX): bblcount.cpp hashmap/hash.h
+$(OBJDIR)blockcounter$(OBJ_SUFFIX): blockcounter.cpp
 	$(CXX) $(TOOL_CXXFLAGS) $(COMP_OBJ)$@ $<	
 
 # Build the tool as a dll (shared object) for ins trace.
-$(OBJDIR)bblcount$(PINTOOL_SUFFIX): $(OBJDIR)bblcount$(OBJ_SUFFIX) $(OBJDIR)hash$(OBJ_SUFFIX)
-	$(LINKER) $(TOOL_LDFLAGS_NOOPT) $(LINK_EXE)$@ $(^:%.h=) $(TOOL_LPATHS) $(TOOL_LIBS)
+$(OBJDIR)blockcounter$(PINTOOL_SUFFIX): $(OBJDIR)blockcounter$(OBJ_SUFFIX)
+	$(LINKER) $(TOOL_LDFLAGS_NOOPT) $(LINK_EXE)$@ $< $(TOOL_LPATHS) $(TOOL_LIBS)

@@ -4,5 +4,4 @@ testing_material
 obj-intel64
 obj-intel32
 pin.log
-bblcount.cpp
-isntructioncount.cpp
+hashmap

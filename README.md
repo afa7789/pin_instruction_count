@@ -51,23 +51,14 @@ git clone https://github.com/afa7789/pin_instruction_count.git tool_folder
 
 ```bash
 cd tool_folder
-make PIN_ROOT=/path/to/pin-folder/ obj-intel64/bblcount.so
-##or
-make PIN_ROOT=/path/to/pin-folder/ obj-intel64/instructioncount.so
+make PIN_ROOT=/path/to/pin-folder/ obj-intel64/blockcounter.so
 ```
 ### Running it
 
-#### instructioncount.cpp
+#### blockcounter.cpp
 
 ```bash
-$PIN_ROOT/pin -t obj-intel64/instructioncount.so -- /bin/ls 
+$PIN_ROOT/pin -t obj-intel64/blockcounter.so -- /bin/ls 
 ##or
-$PIN_ROOT/pin -t obj-intel64/instructioncount.so -o output.txt -- /bin/ls 
-```
-#### bblcount.cpp
-
-```bash
-$PIN_ROOT/pin -t obj-intel64/bblcount.so -- /bin/ls 
-##or
-$PIN_ROOT/pin -t obj-intel64/bblcount.so -o output.txt -- /bin/ls 
+$PIN_ROOT/pin -t obj-intel64/blockcounter.so -o output.txt -- /bin/ls 
 ```
