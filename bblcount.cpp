@@ -61,9 +61,8 @@ VOID Trace(TRACE trace, VOID* v)
             bbl_aux[counter++] = get_instr( (Addr) address , size);
         }
 
-        int bbl_ins_num = BBL_NumIns(bbl);
         // Insert a call to countip before every bbl, passing the number of instructions , and the pointer to the memory struct that stores the instruction count
-        BBL_InsertCall(bbl, IPOINT_BEFORE, (AFUNPTR)countip, IARG_PTR, bbl_aux, IARG_UINT64,bbl_ins_num , IARG_END);
+        BBL_InsertCall(bbl, IPOINT_BEFORE, (AFUNPTR)countip, IARG_PTR, bbl_aux, IARG_UINT64,counter , IARG_END);
     
     }
 }
