@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cassert>
 #include <iostream>
+#include <string>
 #include <map>
 #include <list>
 
@@ -61,6 +62,15 @@ KNOB<string> KnobOutputFile(
     "specify output file name"
 );
 
+KNOB<string> KnobInputFile(
+    KNOB_MODE_WRITEONCE,
+    "pintool",
+    "i",
+    "default",
+    "specify input file name"
+);
+
+
 /* ===================================================================== */
 /* counter increases parameter for every group block                     */
 /* ===================================================================== */
@@ -112,6 +122,56 @@ void flush_groups() {
 }
 
 /* ===================================================================== */
+/* Read previous output as input to add those counters on the hash       */
+/* ===================================================================== */
+
+void read_input_file(FILE* fp){
+    if (fp == 0)
+        return;
+
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    // Define constant data that will be worked as delimiter
+    char delim[] = ":";
+
+    // pointers for functions    
+    char *str ="";
+    char *ptr ="";
+    
+    // while file not ended, reading line
+    while ((read = getline(&line, &len, fp)) != -1) {
+        *str = *line;
+
+        ptr = strtok_r(d, delim,&saveptr1);
+        if (ptr != NULL){
+            // this works only on perfect scenario        
+            ADDRINT address = (ADDRINT)strtol(ptr, NULL, 16);
+        }
+        
+        ptr = strtok_r(d, delim,&saveptr1);
+        if (ptr != NULL){
+            // this works only on perfect scenario        
+            USIZE size = (USIZE) strtol(ptr, NULL, 16);
+        }
+        
+        ptr = strtok_r(d, delim,&saveptr1);
+        if (ptr != NULL){
+            // this works only on perfect scenario        
+            USIZE count = (USIZE) strtol(ptr, NULL, 16);
+        }
+
+        // create instr
+        UniqueInstr* instr = get_instruction(address, size);
+        // add count
+        instr->exec_count += count
+    }
+    
+    free(line);
+    fclose(fp);
+}
+/* ===================================================================== */
 /* Creates stream of instr for print on file or screen                   */
 /* ===================================================================== */
 
@@ -154,17 +214,34 @@ int main(int argc, char * argv[]) {
     // Initialize pin
     if (PIN_Init(argc, argv))
       return Usage();
+    
+    FILE* fo = 0;
+    //file input
+    FILE* fi = 0;
 
-    FILE* fp = 0;
     if (KnobOutputFile.Value() != "default") {
-        fp = fopen(KnobOutputFile.Value().c_str(), "w"); //opening file.
+        fo = fopen(KnobOutputFile.Value().c_str(), "w"); //opening the output file.
+        if (fo == NULL){
+            printf("Error while opening the output file.\n" );
+            exit(0);
+        }
+    }
+
+    if (KnobInputFile.Value() != "default") {
+        fi = fopen(KnobInputFile.Value().c_str(), "r"); //opening the input file.
+        if (fi == NULL){
+            printf("Error while opening the input file.\n");
+            exit(0);
+        }
+        // Reads data from input file.
+        read_input_file(fi);
     }
 
     // Register Instruction to be called to instrument instructions
     TRACE_AddInstrumentFunction(Trace, 0);
 
     // Register fini function.
-    PIN_AddFiniFunction(Fini, fp);
+    PIN_AddFiniFunction(Fini, fo);
 
     // Start the program, never returns.
     PIN_StartProgram();
