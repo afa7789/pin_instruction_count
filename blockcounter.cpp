@@ -123,12 +123,15 @@ void flush_groups() {
 
 /* ===================================================================== */
 /* Read previous output as input to add those counters on the hash       */
+/* This only works for files that follows the output patern              */
+/* It's lacking validation of the file pattern, use wisely               */
 /* ===================================================================== */
 
 void read_input_file(FILE* fp){
     if (fp == 0)
         return;
 
+    // variables for getline
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
