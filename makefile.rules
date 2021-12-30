@@ -4,7 +4,7 @@
 #
 ##############################################################
 
-TOOL_ROOTS := blockcounter
+TOOL_ROOTS := icounter-pin.
 
 ##############################################################
 #
@@ -18,9 +18,9 @@ TOOL_ROOTS := blockcounter
 ###### Special applications' build rules ######
 
 # Build the intermediate object file for the bbl trace.
-$(OBJDIR)blockcounter$(OBJ_SUFFIX): blockcounter.cpp
+$(OBJDIR)icounter-pin.$(OBJ_SUFFIX): icounter-pin..cpp
 	$(CXX) $(TOOL_CXXFLAGS) $(COMP_OBJ)$@ $<	
 
 # Build the tool as a dll (shared object) for ins trace.
-$(OBJDIR)blockcounter$(PINTOOL_SUFFIX): $(OBJDIR)blockcounter$(OBJ_SUFFIX)
+$(OBJDIR)icounter-pin.$(PINTOOL_SUFFIX): $(OBJDIR)icounter-pin.$(OBJ_SUFFIX)
 	$(LINKER) $(TOOL_LDFLAGS_NOOPT) $(LINK_EXE)$@ $< $(TOOL_LPATHS) $(TOOL_LIBS)

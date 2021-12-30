@@ -1,11 +1,11 @@
 ![!Theme Image](resources/tool_header.png)
 # Pin Tools
-## Instruction Count & BBL Count
-Two simple instrumentation for instruction counting made on c++ to be used with [intel pin](https://www.intel.com/content/www/us/en/developer/articles/tool/pin-a-dynamic-binary-instrumentation-tool.html).
+## Instruction counter PIN
+Simple instrumentation that does a instruction counting made on c++ to be used with [intel pin](https://www.intel.com/content/www/us/en/developer/articles/tool/pin-a-dynamic-binary-instrumentation-tool.html). It uses isntructions blocks to count it faster.
 
 ## Disclaimer
 
-These instructions tools have a hashmap folder, that's a c library made with [Andrei Rimsa](http://rimsa.com.br/page/) `mostly him` :rofl: , my professor and thesis tutor from CEFET-MG. 
+The instructions tool were made with the tutoring and help of [Andrei Rimsa](http://rimsa.com.br/page/). Andrei is my professor and thesis tutor from CEFET-MG.
 
 ## How to Install
 
@@ -51,14 +51,14 @@ git clone https://github.com/afa7789/pin_instruction_count.git tool_folder
 
 ```bash
 cd tool_folder
-make PIN_ROOT=/path/to/pin-folder/ obj-intel64/blockcounter.so
+make PIN_ROOT=/path/to/pin-folder/ obj-intel64/icounter-pin..so
 ```
 ### Running it
 
-#### blockcounter.cpp
+#### icounter-pin..cpp
 
 ```bash
-$PIN_ROOT/pin -t obj-intel64/blockcounter.so -- /bin/ls 
+$PIN_ROOT/pin -t obj-intel64/icounter-pin..so -- /bin/ls 
 ##or
-$PIN_ROOT/pin -t obj-intel64/blockcounter.so -o output.txt -- /bin/ls 
+$PIN_ROOT/pin -t obj-intel64/icounter-pin..so -o output.txt -- /bin/ls 
 ```

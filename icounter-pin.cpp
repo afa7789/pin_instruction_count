@@ -1,8 +1,18 @@
+/*
+ * Copyright 2002-2019 Intel Corporation.
+ * 
+ * This software is provided to you as Sample Source Code as defined in the accompanying
+ * End User License Agreement for the Intel(R) Software Development Products ("Agreement")
+ * section 1.L.
+ * 
+ * This software and the related documents are provided as is, with no express or implied
+ * warranties, other than those that are expressly stated in the License.
+ */
 
 #include <cstdio>
 #include <cassert>
 #include <iostream>
-#include <string>
+#include <fstream>
 #include <map>
 #include <list>
 
@@ -10,16 +20,21 @@
 
 using namespace std;
 
-// Representation of a Unique Instruction
+/* ===================================================================== */
+/* Structs                                                               */
+/* ===================================================================== */
+
+// Struct to represent Unique Instruction
 struct UniqueInstr {
     ADDRINT addr;
     USIZE size;
     USIZE exec_count;
 
-    UniqueInstr(ADDRINT addr = 0, USIZE size = 0) : addr(addr), size(size), exec_count(0) {}
+    UniqueInstr(ADDRINT addr = 0, USIZE size = 0)
+	: addr(addr), size(size), exec_count(0) {}
 };
 
-// Representation of a Instruction Group
+// Representation of a group of unique instructions
 struct InstrGroup {
     USIZE exec_count;
     std::list<UniqueInstr*> instrs;
@@ -27,18 +42,36 @@ struct InstrGroup {
     InstrGroup(USIZE size) : exec_count(0) {}
 };
 
+/* ===================================================================== */
+/* Way Pin handles command line parameters                               */
+/* ===================================================================== */
+
+KNOB<string> KnobInputFile(
+    KNOB_MODE_WRITEONCE,
+    "pintool",
+    "i",
+    "default",
+    "specify input file name"
+);
+
+KNOB<string> KnobOutputFile(
+    KNOB_MODE_WRITEONCE,
+    "pintool",
+    "o",
+    "default",
+    "specify output file name"
+);
+
 // Instructions HashMap
 std::map<ADDRINT, UniqueInstr*> instructions;
-
 // Instruction Group as list
 std::list<InstrGroup*> groups;
 
-
 /* ===================================================================== */
-/*  Form of getting the instruction or creating a new one                */
+/*  Form of fetching the instruction or creating a new one                */
 /* ===================================================================== */
 
-UniqueInstr* get_instruction(ADDRINT addr, USIZE size = 0) {
+UniqueInstr* fetch_instr(ADDRINT addr, USIZE size = 0) {
     UniqueInstr* instr = instructions[addr];
     if (instr == 0) {
         instr = new UniqueInstr(addr, size);
@@ -51,28 +84,30 @@ UniqueInstr* get_instruction(ADDRINT addr, USIZE size = 0) {
 }
 
 /* ===================================================================== */
-/* Way Pin handles command line parameters                               */
+/* Read Instructions of another filename                                 */
 /* ===================================================================== */
 
-KNOB<string> KnobOutputFile(
-    KNOB_MODE_WRITEONCE,
-    "pintool",
-    "o",
-    "default",
-    "specify output file name"
-);
+void read_instrs(const char* filename) {
+    FILE* f;
+    char buffer[255];
+    static char sep[] = ":\r\n";
 
-KNOB<string> KnobInputFile(
-    KNOB_MODE_WRITEONCE,
-    "pintool",
-    "i",
-    "default",
-    "specify input file name"
-);
+    f = fopen(filename, "r");
+    if (f != 0) {
+        while (fgets(buffer, sizeof(buffer), f) > 0) {
+            ADDRINT addr = strtoull(strtok(buffer+2, sep), 0, 16);
+            USIZE size = atoi(strtok(0, sep));
 
+            UniqueInstr* instr = fetch_instr(addr, size);
+            instr->exec_count += strtoull(strtok(0, sep), 0, 10);
+        }
+
+        fclose(f);
+    }
+}
 
 /* ===================================================================== */
-/* counter increases parameter for every group block                     */
+/* Increases exec count of Instrucution group                            */
 /* ===================================================================== */
 
 VOID counter(InstrGroup* group) {
@@ -80,7 +115,7 @@ VOID counter(InstrGroup* group) {
 }
 
 /* ===================================================================== */
-/* Creates the Trace that builds the blocks                              */
+/* Creates the Trace that fetches the Basic blocks                       */
 /* ===================================================================== */
 
 VOID Trace(TRACE trace, VOID* v) {
@@ -95,7 +130,7 @@ VOID Trace(TRACE trace, VOID* v) {
             ADDRINT addr = INS_Address(ins);
             USIZE size = INS_Size(ins);
 
-            UniqueInstr* instr = get_instruction(addr, size);
+            UniqueInstr* instr = fetch_instr(addr, size);
             group->instrs.push_back(instr);
         }
 
@@ -104,7 +139,7 @@ VOID Trace(TRACE trace, VOID* v) {
 }
 
 /* ===================================================================== */
-/* Counts group into the individual isntructions in the Hash.            */
+/* Counts groups into the individual instructions in the Hash.           */
 /* ===================================================================== */
 
 void flush_groups() {
@@ -121,59 +156,6 @@ void flush_groups() {
     }
 }
 
-/* ===================================================================== */
-/* Read previous output as input to add those counters on the hash       */
-/* This only works for files that follows the output patern              */
-/* It's lacking validation of the file pattern, use wisely               */
-/* ===================================================================== */
-
-void read_input_file(FILE* fp){
-    if (fp == 0)
-        return;
-
-    // variables for getline
-    char * line = NULL;
-    size_t len = 0;
-    ssize_t read;
-
-    // Define constant data that will be worked as delimiter
-    char delim[] = ":";
-
-    // pointers for functions    
-    char *str ="";
-    char *ptr ="";
-    
-    // while file not ended, reading line
-    while ((read = getline(&line, &len, fp)) != -1) {
-        *str = *line;
-
-        ptr = strtok_r(d, delim,&saveptr1);
-        if (ptr != NULL){
-            // this works only on perfect scenario        
-            ADDRINT address = (ADDRINT)strtol(ptr, NULL, 16);
-        }
-        
-        ptr = strtok_r(d, delim,&saveptr1);
-        if (ptr != NULL){
-            // this works only on perfect scenario        
-            USIZE size = (USIZE) strtol(ptr, NULL, 16);
-        }
-        
-        ptr = strtok_r(d, delim,&saveptr1);
-        if (ptr != NULL){
-            // this works only on perfect scenario        
-            USIZE count = (USIZE) strtol(ptr, NULL, 16);
-        }
-
-        // create instr
-        UniqueInstr* instr = get_instruction(address, size);
-        // add count
-        instr->exec_count += count
-    }
-    
-    free(line);
-    fclose(fp);
-}
 /* ===================================================================== */
 /* Creates stream of instr for print on file or screen                   */
 /* ===================================================================== */
@@ -192,6 +174,7 @@ void dump_instrs(FILE* fp) {
 
 /* ===================================================================== */
 /* Ends Application , Prints Data                                        */
+/* This function is called when the application exits                    */
 /* ===================================================================== */
 
 VOID Fini(INT32 code, VOID *v) {
@@ -204,7 +187,7 @@ VOID Fini(INT32 code, VOID *v) {
 /* ===================================================================== */
 
 INT32 Usage() {
-    PIN_ERROR("This Pintool prints the IPs of every instruction executed\n" 
+    PIN_ERROR("This Pintool counts every instruction executed\n" 
               + KNOB_BASE::StringKnobSummary() + "\n");
     return -1;
 }
@@ -217,34 +200,21 @@ int main(int argc, char * argv[]) {
     // Initialize pin
     if (PIN_Init(argc, argv))
       return Usage();
-    
-    FILE* fo = 0;
-    //file input
-    FILE* fi = 0;
-
-    if (KnobOutputFile.Value() != "default") {
-        fo = fopen(KnobOutputFile.Value().c_str(), "w"); //opening the output file.
-        if (fo == NULL){
-            printf("Error while opening the output file.\n" );
-            exit(0);
-        }
-    }
 
     if (KnobInputFile.Value() != "default") {
-        fi = fopen(KnobInputFile.Value().c_str(), "r"); //opening the input file.
-        if (fi == NULL){
-            printf("Error while opening the input file.\n");
-            exit(0);
-        }
-        // Reads data from input file.
-        read_input_file(fi);
+       read_instrs(KnobInputFile.Value().c_str());
+    }
+
+    FILE* fp = 0;
+    if (KnobOutputFile.Value() != "default") {
+        fp = fopen(KnobOutputFile.Value().c_str(), "w");
     }
 
     // Register Instruction to be called to instrument instructions
     TRACE_AddInstrumentFunction(Trace, 0);
 
     // Register fini function.
-    PIN_AddFiniFunction(Fini, fo);
+    PIN_AddFiniFunction(Fini, fp);
 
     // Start the program, never returns.
     PIN_StartProgram();
