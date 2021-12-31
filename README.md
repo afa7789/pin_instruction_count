@@ -1,4 +1,4 @@
-![!Theme Image](resources/tool_header.png)
+![!Theme Image](resources/icounter_header.png)
 # Pin Tools
 ## Instruction counter PIN
 Simple instrumentation that does a instruction counting made on c++ to be used with [intel pin](https://www.intel.com/content/www/us/en/developer/articles/tool/pin-a-dynamic-binary-instrumentation-tool.html). It uses isntructions blocks to count it faster.
